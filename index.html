@@ -3,69 +3,82 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Carte à gratter 1080x1920</title>
+<title>Carte à gratter zone centrée</title>
 <style>
   body {
     margin:0; padding:0; background:#f0f0f0;
     display: flex; justify-content: center; align-items: center; height: 100vh;
+    font-family: Arial, sans-serif;
   }
   #card {
     position: relative;
-    width: 1080px;
-    height: 1920px;
-    border-radius: 20px;
+    width: 320px;
+    height: 569px; /* ratio 1080x1920 */
+    border-radius: 15px;
     overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
     user-select: none;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
   }
   #card img {
-    width: 1080px;
-    height: 1920px;
+    width: 320px;
+    height: 569px;
     object-fit: cover;
     display: block;
+    border-radius: 15px;
   }
-  #message {
+
+  /* Canvas zone grattable : plus petite et centrée */
+  #scratchCanvas {
     position: absolute;
-    top: 960px; /* centre verticalement, ajuste selon ton visuel */
-    left: 50%;
-    transform: translateX(-50%);
-    color: #222;
-    font-weight: 700;
-    font-size: 3rem;
-    pointer-events: none;
-    z-index: 1;
-    text-align: center;
-    width: 80%;
-    user-select: none;
-  }
-  canvas {
-    position: absolute;
-    top: 0; left: 0;
-    width: 1080px;
-    height: 1920px;
-    border-radius: 20px;
+    width: 200px;
+    height: 300px;
+    top: calc(50% - 150px); /* centrage vertical */
+    left: calc(50% - 100px); /* centrage horizontal */
+    border-radius: 15px;
     cursor: pointer;
     z-index: 2;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  }
+
+  /* Texte dans la zone à gratter, centré */
+  #message {
+    position: absolute;
+    width: 200px;
+    height: 300px;
+    top: calc(50% - 150px);
+    left: calc(50% - 100px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #222;
+    font-weight: 700;
+    font-size: 1.6rem;
+    text-align: center;
+    pointer-events: none;
+    z-index: 1;
+    user-select: none;
   }
 </style>
 </head>
 <body>
 
 <div id="card">
-  <img src="https://raw.githubusercontent.com/Cecile3510/ticket-grattable/cde9a0625518b9742e53d681acc02dd2eac6f5dc/images/fille%20ou%20garcon.png" alt="Visuel à découvrir"/>
+  <img src="https://raw.githubusercontent.com/Cecile3510/ticket-grattable/cde9a0625518b9742e53d681acc02dd2eac6f5dc/images/fille%20ou%20garcon.png" alt="Visuel à découvrir" />
+  
   <div id="message">🎉 Surprise ! 🎉</div>
-  <canvas id="scratchCanvas" width="1080" height="1920"></canvas>
+  
+  <canvas id="scratchCanvas" width="200" height="300"></canvas>
 </div>
 
 <script>
   const canvas = document.getElementById('scratchCanvas');
   const ctx = canvas.getContext('2d');
 
-  // Important : définir les dimensions du canvas en JS pour correspondre au vrai canvas
-  canvas.width = 1080;
-  canvas.height = 1920;
+  // Fixe la taille réelle du canvas (attention à ne pas confondre avec la taille CSS)
+  canvas.width = 200;
+  canvas.height = 300;
 
-  // Remplissage initial du canvas par un masque gris métallique opaque
+  // Remplissage gris métallique
   const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
   gradient.addColorStop(0, '#b0b0b0');
   gradient.addColorStop(0.5, '#d9d9d9');
@@ -73,7 +86,7 @@
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  const brushRadius = 60; // taille du pinceau à gratter, tu peux ajuster
+  const brushRadius = 20; // pinceau plus petit pour zone plus petite
   let isDrawing = false;
 
   function getPointerPos(e) {
