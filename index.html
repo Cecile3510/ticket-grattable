@@ -6,6 +6,8 @@
 <style>
   html, body {
     margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden;
+  }
+  body {
     background: url('fille ou garcon v2.png') no-repeat center center;
     background-size: cover;
   }
@@ -26,14 +28,14 @@
 </head>
 <body>
   <div id="container">
-    <canvas id="scratchCanvas" width="400" height="400"></canvas>
+    <canvas id="scratchCanvas" width="300" height="300"></canvas>
   </div>
 
 <script>
 const canvas = document.getElementById('scratchCanvas');
 const ctx = canvas.getContext('2d');
 
-// Fonction pour dessiner un cœur centré dans le canvas
+// Dessiner la forme du cœur (au centre du canvas)
 function drawHeartPath(ctx, x, y, size) {
   ctx.beginPath();
   const topCurveHeight = size * 0.3;
@@ -61,16 +63,18 @@ function drawHeartPath(ctx, x, y, size) {
   ctx.closePath();
 }
 
+// Remplir la zone grattable
 function drawScratchArea() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.save();
-  drawHeartPath(ctx, canvas.width / 2, 30, 300);
+  drawHeartPath(ctx, canvas.width / 2, 30, 240);
   ctx.clip();
-  ctx.fillStyle = '#CCCCCC'; // couleur grattable
+  ctx.fillStyle = '#aaa'; // Couleur de la surface à gratter
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.restore();
 }
 
+// Initialisation
 drawScratchArea();
 
 let isDrawing = false;
@@ -81,16 +85,20 @@ canvas.addEventListener('mouseleave', () => isDrawing = false);
 
 canvas.addEventListener('mousemove', (e) => {
   if (!isDrawing) return;
+
   const rect = canvas.getBoundingClientRect();
   const x = e.clientX - rect.left;
   const y = e.clientY - rect.top;
+
   ctx.save();
-  drawHeartPath(ctx, canvas.width / 2, 30, 300);
+  drawHeartPath(ctx, canvas.width / 2, 30, 240);
   ctx.clip();
+
   ctx.globalCompositeOperation = 'destination-out';
   ctx.beginPath();
-  ctx.arc(x, y, 20, 0, Math.PI * 2);
+  ctx.arc(x, y, 15, 0, 2 * Math.PI);
   ctx.fill();
+
   ctx.restore();
 });
 </script>
