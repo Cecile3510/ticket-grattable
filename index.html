@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Carte à gratter - zone plus petite</title>
+<title>Carte à gratter fonctionnelle</title>
 <style>
   body {
     margin:0; padding:0; background:#f5f5f5;
@@ -24,8 +24,8 @@
   #scratchCanvas {
     position: absolute;
     width: 300px;
-    height: 120px; /* hauteur encore plus petite */
-    top: calc(50% - 60px); /* centrage vertical ajusté */
+    height: 120px;
+    top: calc(50% - 60px);
     left: calc(50% - 150px);
     border-radius: 15px;
     cursor: pointer;
@@ -44,10 +44,11 @@
   const canvas = document.getElementById('scratchCanvas');
   const ctx = canvas.getContext('2d');
 
+  // Dimensions canvas (important)
   canvas.width = 300;
   canvas.height = 120;
 
-  // Dégradé métallique
+  // Créer un dégradé métallique gris pour le masque
   const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
   gradient.addColorStop(0, '#b0b0b0');
   gradient.addColorStop(0.25, '#d9d9d9');
@@ -57,7 +58,7 @@
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // Rayures fines
+  // Ajouter des rayures fines blanches (effet métal brossé)
   ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
   ctx.lineWidth = 1;
   for(let i = -canvas.height; i < canvas.width; i += 6) {
