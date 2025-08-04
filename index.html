@@ -1,41 +1,41 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Carte à gratter numérique</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gratte-cœur</title>
   <style>
     body {
-      background-color: #fbeee6;
-      font-family: Arial, sans-serif;
-      text-align: center;
       margin: 0;
-      padding: 20px;
+      padding: 0;
+      background: #f4f4f4;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
     }
 
-    .card-container {
+    .scratch-container {
       position: relative;
-      display: inline-block;
       width: 350px;
-      height: 500px;
-      background: white;
-      border-radius: 20px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      height: 600px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
       overflow: hidden;
+      background-color: white;
     }
 
-    .card-image {
+    .hidden-image {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      display: block;
     }
 
-    canvas {
+    #scratchCanvas {
       position: absolute;
       top: 0;
       left: 0;
-      border-radius: 20px;
-      cursor: pointer;
+      z-index: 2;
     }
 
     .heart {
@@ -43,19 +43,17 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      font-size: 60px;
+      z-index: 1;
+      font-size: 100px;
       color: #a57865;
       pointer-events: none;
     }
   </style>
 </head>
 <body>
-
-  <h2>Gratte pour découvrir le message</h2>
-
-  <div class="card-container">
-    <img src="https://i.ibb.co/mhMGqPk/fille-rose.jpg" alt="Image à révéler" class="card-image" id="revealedImage">
-    <canvas id="scratchCanvas" width="350" height="500"></canvas>
+  <div class="scratch-container">
+    <img src="https://i.ibb.co/X4Zt2VZ/message-coeur.png" alt="Message caché" class="hidden-image">
+    <canvas id="scratchCanvas" width="350" height="600"></canvas>
     <div class="heart">❤️</div>
   </div>
 
@@ -63,44 +61,40 @@
     const canvas = document.getElementById('scratchCanvas');
     const ctx = canvas.getContext('2d');
 
-    const image = new Image();
-    image.onload = () => {
-      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-    };
-    image.src = 'https://i.ibb.co/hgZZnR7/grattage-fond-beige.jpg'; // image à gratter
+    // Remplir le canvas avec une couleur grise (zone à gratter)
+    ctx.fillStyle = '#cccccc';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.globalCompositeOperation = 'destination-out';
 
     let isDrawing = false;
 
-    function getMousePos(canvas, e) {
-      const rect = canvas.getBoundingClientRect();
-      return {
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top
-      };
-    }
+    canvas.addEventListener('mousedown', (e) => {
+      isDrawing = true;
+      scratch(e);
+    });
 
-    function erase(e) {
-      if (!isDrawing) return;
-      const pos = getMousePos(canvas, e);
-      ctx.globalCompositeOperation = 'destination-out';
+    canvas.addEventListener('mousemove', (e) => {
+      if (isDrawing) scratch(e);
+    });
+
+    canvas.addEventListener('mouseup', () => {
+      isDrawing = false;
+    });
+
+    canvas.addEventListener('mouseleave', () => {
+      isDrawing = false;
+    });
+
+    function scratch(e) {
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
       ctx.beginPath();
-      ctx.arc(pos.x, pos.y, 25, 0, Math.PI * 2);
+      ctx.arc(x, y, 25, 0, Math.PI * 2);
       ctx.fill();
     }
-
-    canvas.addEventListener('mousedown', () => isDrawing = true);
-    canvas.addEventListener('mouseup', () => isDrawing = false);
-    canvas.addEventListener('mousemove', erase);
-    canvas.addEventListener('touchstart', (e) => {
-      isDrawing = true;
-      erase(e.touches[0]);
-    });
-    canvas.addEventListener('touchend', () => isDrawing = false);
-    canvas.addEventListener('touchmove', (e) => {
-      erase(e.touches[0]);
-      e.preventDefault();
-    });
   </script>
-
 </body>
 </html>
