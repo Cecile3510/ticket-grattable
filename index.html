@@ -1,80 +1,127 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Ticket à gratter</title>
+  <meta charset="UTF-8" />
+  <title>Fille ou garçon ?</title>
   <style>
-    body {
-      background-color: #222;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+    html, body {
       margin: 0;
-    }
-    #scratch-container {
-      position: relative;
-      width: 300px;
-      height: 300px;
-    }
-    #result {
-      position: absolute;
-      top: 0;
-      left: 0;
+      padding: 0;
       width: 100%;
       height: 100%;
-      background: white;
-      color: #333;
-      font-size: 24px;
-      font-weight: bold;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 0;
+      overflow: hidden;
     }
-    #scratch {
+
+    body {
+      background: url("fille ou garcon v2.png") no-repeat center center;
+      background-size: cover;
+      position: relative;
+      width: 1080px;
+      height: 1920px;
+    }
+
+    #container {
       position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 1;
-      cursor: crosshair;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    #scratchCanvas {
+      border-radius: 0;
+      cursor: pointer;
+    }
+
+    #hiddenText {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 50px;
+      color: #d6336c;
+      font-weight: bold;
+      text-align: center;
+      pointer-events: none;
     }
   </style>
 </head>
 <body>
-  <div id="scratch-container">
-    <div id="result">C'est une fille !</div>
-    <canvas id="scratch" width="300" height="300"></canvas>
+  <div id="container">
+    <div id="hiddenText">🎀 C’est une fille !</div>
+    <canvas id="scratchCanvas" width="300" height="300"></canvas>
   </div>
 
   <script>
-    const canvas = document.getElementById("scratch");
-    const ctx = canvas.getContext("2d");
-    const img = new Image();
-    img.src = "fille ou garcon v2.png";
+    const canvas = document.getElementById('scratchCanvas');
+    const ctx = canvas.getContext('2d');
 
-    img.onload = function () {
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    };
+    // Dessine une forme de cœur
+    function drawHeartClip(ctx, x, y, size) {
+      ctx.beginPath();
+      const topCurveHeight = size * 0.3;
+      ctx.moveTo(x, y + topCurveHeight);
+      ctx.bezierCurveTo(
+        x, y,
+        x - size / 2, y,
+        x - size / 2, y + topCurveHeight
+      );
+      ctx.bezierCurveTo(
+        x - size / 2, y + size / 1.5,
+        x, y + size,
+        x, y + size
+      );
+      ctx.bezierCurveTo(
+        x, y + size,
+        x + size / 2, y + size / 1.5,
+        x + size / 2, y + topCurveHeight
+      );
+      ctx.bezierCurveTo(
+        x + size / 2, y,
+        x, y,
+        x, y + topCurveHeight
+      );
+      ctx.closePath();
+    }
+
+    // Remplit la forme du cœur avec la surface à gratter
+    function drawScratchSurface() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.save();
+      drawHeartClip(ctx, canvas.width / 2, 30, 200);
+      ctx.clip();
+      ctx.fillStyle = '#CCCCCC'; // gris
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.restore();
+    }
+
+    drawScratchSurface();
 
     let isDrawing = false;
 
-    canvas.addEventListener("mousedown", () => isDrawing = true);
-    canvas.addEventListener("mouseup", () => isDrawing = false);
-    canvas.addEventListener("mouseleave", () => isDrawing = false);
-    canvas.addEventListener("mousemove", draw);
-
-    function draw(e) {
-      if (!isDrawing) return;
+    function getMousePos(canvas, e) {
       const rect = canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-
-      ctx.globalCompositeOperation = "destination-out";
-      ctx.beginPath();
-      ctx.arc(x, y, 20, 0, Math.PI * 2, false);
-      ctx.fill();
+      return {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+      };
     }
+
+    canvas.addEventListener('mousedown', () => isDrawing = true);
+    canvas.addEventListener('mouseup', () => isDrawing = false);
+    canvas.addEventListener('mouseleave', () => isDrawing = false);
+
+    canvas.addEventListener('mousemove', function(e) {
+      if (!isDrawing) return;
+      const pos = getMousePos(canvas, e);
+      ctx.save();
+      drawHeartClip(ctx, canvas.width / 2, 30, 200);
+      ctx.clip();
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.beginPath();
+      ctx.arc(pos.x, pos.y, 15, 0, 2 * Math.PI);
+      ctx.fill();
+      ctx.restore();
+    });
   </script>
 </body>
 </html>
