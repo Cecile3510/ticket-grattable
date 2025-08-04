@@ -9,7 +9,9 @@
   }
   body {
     background: url('images/fille ou garcon v2.png') no-repeat center center;
-    background-size: cover;
+    background-size: auto; /* Garde taille réelle */
+  background-position: center top; /* Centré horizontalement, aligné en haut */
+  background-repeat: no-repeat;
   }
   #container {
     position: relative;
@@ -104,5 +106,6 @@ canvas.addEventListener('mousemove', (e) => {
 </script>
 </body>
 </html>
+
 
 
