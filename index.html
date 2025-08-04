@@ -3,56 +3,48 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Carte à gratter zone centrée</title>
+<title>Carte à gratter style Persée Graphisme</title>
 <style>
   body {
-    margin:0; padding:0; background:#f0f0f0;
+    margin:0; padding:0; background:#f5f5f5;
     display: flex; justify-content: center; align-items: center; height: 100vh;
-    font-family: Arial, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   }
   #card {
     position: relative;
     width: 320px;
-    height: 569px; /* ratio 1080x1920 */
+    height: 569px;
     border-radius: 15px;
     overflow: hidden;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
     user-select: none;
-  }
-  #card img {
-    width: 320px;
-    height: 569px;
-    object-fit: cover;
-    display: block;
-    border-radius: 15px;
+    background: url('https://raw.githubusercontent.com/Cecile3510/ticket-grattable/cde9a0625518b9742e53d681acc02dd2eac6f5dc/images/fille%20ou%20garcon.png') no-repeat center center/cover;
   }
 
-  /* Canvas zone grattable : plus petite et centrée */
   #scratchCanvas {
     position: absolute;
-    width: 200px;
+    width: 300px;
     height: 300px;
-    top: calc(50% - 150px); /* centrage vertical */
-    left: calc(50% - 100px); /* centrage horizontal */
+    top: calc(50% - 150px);
+    left: calc(50% - 150px);
     border-radius: 15px;
     cursor: pointer;
     z-index: 2;
-    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    box-shadow: 0 0 15px rgba(0,0,0,0.25);
   }
 
-  /* Texte dans la zone à gratter, centré */
   #message {
     position: absolute;
-    width: 200px;
+    width: 300px;
     height: 300px;
     top: calc(50% - 150px);
-    left: calc(50% - 100px);
+    left: calc(50% - 150px);
     display: flex;
     justify-content: center;
     align-items: center;
     color: #222;
     font-weight: 700;
-    font-size: 1.6rem;
+    font-size: 1.8rem;
     text-align: center;
     pointer-events: none;
     z-index: 1;
@@ -63,30 +55,39 @@
 <body>
 
 <div id="card">
-  <img src="https://raw.githubusercontent.com/Cecile3510/ticket-grattable/cde9a0625518b9742e53d681acc02dd2eac6f5dc/images/fille%20ou%20garcon.png" alt="Visuel à découvrir" />
-  
   <div id="message">🎉 Surprise ! 🎉</div>
-  
-  <canvas id="scratchCanvas" width="200" height="300"></canvas>
+  <canvas id="scratchCanvas" width="300" height="300"></canvas>
 </div>
 
 <script>
   const canvas = document.getElementById('scratchCanvas');
   const ctx = canvas.getContext('2d');
 
-  // Fixe la taille réelle du canvas (attention à ne pas confondre avec la taille CSS)
-  canvas.width = 200;
+  // Dimensions canvas (important pour le rendu)
+  canvas.width = 300;
   canvas.height = 300;
 
-  // Remplissage gris métallique
+  // Création d’un dégradé métallique pour le masque
   const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
   gradient.addColorStop(0, '#b0b0b0');
-  gradient.addColorStop(0.5, '#d9d9d9');
+  gradient.addColorStop(0.25, '#d9d9d9');
+  gradient.addColorStop(0.5, '#f0f0f0');
+  gradient.addColorStop(0.75, '#c0c0c0');
   gradient.addColorStop(1, '#a5a5a5');
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  const brushRadius = 20; // pinceau plus petit pour zone plus petite
+  // Ajout de fines rayures pour effet métal brossé
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+  ctx.lineWidth = 1;
+  for(let i = -canvas.height; i < canvas.width; i += 6) {
+    ctx.beginPath();
+    ctx.moveTo(i, 0);
+    ctx.lineTo(i + canvas.height, canvas.height);
+    ctx.stroke();
+  }
+
+  const brushRadius = 20;
   let isDrawing = false;
 
   function getPointerPos(e) {
