@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Carte à gratter digitale </title>
+<title>Carte à gratter digitale - avec visuel Canva</title>
 <style>
   body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -37,6 +37,7 @@
     padding: 20px;
     text-align: center;
     pointer-events: none;
+    z-index: 1;
   }
   canvas {
     position: absolute;
@@ -46,13 +47,22 @@
     border-radius: 15px;
     cursor: pointer;
     background: linear-gradient(135deg, #a5a5a5, #d9d9d9);
+    z-index: 2;
   }
 </style>
 </head>
 <body>
 
 <div id="card">
-  <div id="message">🎉 C’est un garçon ! 🎉</div>
+  <!-- Visuel Canva en fond -->
+  <img src="https://raw.githubusercontent.com/Cecile3510/ticket-grattable/cde9a0625518b9742e53d681acc02dd2eac6f5dc/images/fille%20ou%20garcon.png" 
+       alt="Visuel à découvrir"
+       style="width: 100%; height: 100%; object-fit: cover; border-radius: 15px;" />
+  
+  <!-- Message caché (optionnel) -->
+  <div id="message">🎉 Surprise ! 🎉</div>
+  
+  <!-- Canvas pour gratter -->
   <canvas id="scratchCanvas" width="320" height="200"></canvas>
 </div>
 
@@ -60,7 +70,7 @@
   const canvas = document.getElementById('scratchCanvas');
   const ctx = canvas.getContext('2d');
 
-  // Setup canvas size (for high DPI screens)
+  // Configuration pour les écrans HD
   function setupCanvas(canvas) {
     const dpr = window.devicePixelRatio || 1;
     const rect = canvas.getBoundingClientRect();
@@ -70,7 +80,7 @@
   }
   setupCanvas(canvas);
 
-  // Fill the canvas with a metallic silver gradient (mask)
+  // Remplir la zone grattable avec un dégradé argenté
   const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
   gradient.addColorStop(0, '#b0b0b0');
   gradient.addColorStop(0.5, '#d9d9d9');
@@ -78,9 +88,7 @@
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // Brush size
   const brushRadius = 30;
-
   let isDrawing = false;
 
   function getPointerPos(e) {
@@ -134,4 +142,3 @@
 
 </body>
 </html>
-
