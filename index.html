@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Carte à gratter style Persée Graphisme</title>
+<title>Carte à gratter - zone plus petite</title>
 <style>
   body {
     margin:0; padding:0; background:#f5f5f5;
@@ -24,6 +24,17 @@
   #scratchCanvas {
     position: absolute;
     width: 300px;
-    height: 200px; /* hauteur réduite */
-    top: calc(50% - 100px); /* centrage vertical ajusté */
-    left: ca
+    height: 120px; /* hauteur encore plus petite */
+    top: calc(50% - 60px); /* centrage vertical ajusté */
+    left: calc(50% - 150px);
+    border-radius: 15px;
+    cursor: pointer;
+    z-index: 2;
+    box-shadow: 0 0 15px rgba(0,0,0,0.25);
+  }
+</style>
+</head>
+<body>
+
+<div id="card">
+  <canvas id="scratchCanvas" width="300" height="120
