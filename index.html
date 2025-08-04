@@ -2,103 +2,117 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Carte à gratter</title>
+  <title>Fille ou Garçon ?</title>
   <style>
-    body, html {
+    body {
       margin: 0;
-      padding: 0;
-      height: 100%;
       background: #000;
       display: flex;
       justify-content: center;
       align-items: center;
+      height: 100vh;
     }
-    #scratchContainer {
-      position: relative;
-      width: 1080px;
-      height: 1920px;
-    }
-    #backgroundImage {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 1;
-    }
+
     canvas {
       position: absolute;
       top: 0;
       left: 0;
-      z-index: 2;
+      cursor: pointer;
+    }
+
+    #container {
+      position: relative;
+      max-width: 100%;
+      max-height: 100%;
+    }
+
+    img {
+      display: block;
+      width: 100%;
+      height: auto;
     }
   </style>
 </head>
 <body>
-  <div id="scratchContainer">
-    <img id="backgroundImage" src="fille ou garcon v2.png" alt="Carte à gratter" />
-    <canvas id="scratchCanvas" width="1080" height="1920"></canvas>
+  <div id="container">
+    <img id="revealImage" src="fille%20ou%20garcon%20v2.png" alt="Ticket à gratter">
+    <canvas id="scratchCanvas"></canvas>
   </div>
 
   <script>
+    const img = document.getElementById("revealImage");
     const canvas = document.getElementById("scratchCanvas");
     const ctx = canvas.getContext("2d");
 
-    // Dessiner une forme de cœur
-    function drawHeart(x, y, width, height) {
-      const topCurveHeight = height * 0.3;
-      ctx.beginPath();
-      ctx.moveTo(x, y + topCurveHeight);
-      ctx.bezierCurveTo(x, y, x - width / 2, y, x - width / 2, y + topCurveHeight);
-      ctx.bezierCurveTo(x - width / 2, y + (height + topCurveHeight) / 2, x, y + (height + topCurveHeight) / 2, x, y + height);
-      ctx.bezierCurveTo(x, y + (height + topCurveHeight) / 2, x + width / 2, y + (height + topCurveHeight) / 2, x + width / 2, y + topCurveHeight);
-      ctx.bezierCurveTo(x + width / 2, y, x, y, x, y + topCurveHeight);
-      ctx.closePath();
-      ctx.fillStyle = "#C0C0C0";
-      ctx.fill();
-    }
+    img.onload = () => {
+      canvas.width = img.clientWidth;
+      canvas.height = img.clientHeight;
 
-    function drawMask() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.globalCompositeOperation = "source-over";
-      // Centre le cœur sur l'image
-      const heartWidth = 400;
-      const heartHeight = 500; // plus haut que large
-      const x = (canvas.width - heartWidth) / 2;
-      const y = (canvas.height - heartHeight) / 2;
-      drawHeart(x, y, heartWidth, heartHeight);
-    }
-
-    drawMask();
-
-    let isDrawing = false;
-
-    function scratch(e) {
-      const rect = canvas.getBoundingClientRect();
-      const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
-      const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+      // Couleur de la surface à gratter
+      ctx.fillStyle = "#cccccc";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       ctx.globalCompositeOperation = "destination-out";
-      ctx.beginPath();
-      ctx.arc(x, y, 30, 0, Math.PI * 2);
-      ctx.fill();
-    }
 
-    canvas.addEventListener("mousedown", () => isDrawing = true);
-    canvas.addEventListener("mouseup", () => isDrawing = false);
-    canvas.addEventListener("mousemove", e => isDrawing && scratch(e));
+      let isDrawing = false;
 
-    canvas.addEventListener("touchstart", () => isDrawing = true);
-    canvas.addEventListener("touchend", () => isDrawing = false);
-    canvas.addEventListener("touchmove", e => {
-      if (isDrawing) {
-        scratch(e);
+      const draw = (x, y) => {
+        ctx.beginPath();
+        ctx.arc(x, y, 20, 0, Math.PI * 2);
+        ctx.fill();
+      };
+
+      const getMousePos = (e) => {
+        const rect = canvas.getBoundingClientRect();
+        return {
+          x: e.clientX - rect.left,
+          y: e.clientY - rect.top
+        };
+      };
+
+      const getTouchPos = (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const touch = e.touches[0];
+        return {
+          x: touch.clientX - rect.left,
+          y: touch.clientY - rect.top
+        };
+      };
+
+      canvas.addEventListener("mousedown", (e) => {
+        isDrawing = true;
+        const { x, y } = getMousePos(e);
+        draw(x, y);
+      });
+
+      canvas.addEventListener("mousemove", (e) => {
+        if (!isDrawing) return;
+        const { x, y } = getMousePos(e);
+        draw(x, y);
+      });
+
+      canvas.addEventListener("mouseup", () => {
+        isDrawing = false;
+      });
+
+      canvas.addEventListener("touchstart", (e) => {
         e.preventDefault();
-      }
-    });
+        isDrawing = true;
+        const { x, y } = getTouchPos(e);
+        draw(x, y);
+      });
+
+      canvas.addEventListener("touchmove", (e) => {
+        e.preventDefault();
+        if (!isDrawing) return;
+        const { x, y } = getTouchPos(e);
+        draw(x, y);
+      });
+
+      canvas.addEventListener("touchend", () => {
+        isDrawing = false;
+      });
+    };
   </script>
 </body>
 </html>
-
