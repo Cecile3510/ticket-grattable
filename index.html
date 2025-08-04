@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Carte à gratter digitale - avec visuel Canva</title>
+<title>Carte à gratter digitale corrigée</title>
 <style>
   body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -39,14 +39,11 @@
     pointer-events: none;
     z-index: 1;
   }
-  canvas {
+  #scratchCanvas {
     position: absolute;
     top: 0; left: 0;
-    width: 320px;
-    height: 200px;
     border-radius: 15px;
     cursor: pointer;
-    background: linear-gradient(135deg, #a5a5a5, #d9d9d9);
     z-index: 2;
   }
 </style>
@@ -54,15 +51,12 @@
 <body>
 
 <div id="card">
-  <!-- Visuel Canva en fond -->
   <img src="https://raw.githubusercontent.com/Cecile3510/ticket-grattable/cde9a0625518b9742e53d681acc02dd2eac6f5dc/images/fille%20ou%20garcon.png" 
        alt="Visuel à découvrir"
-       style="width: 100%; height: 100%; object-fit: cover; border-radius: 15px;" />
+       style="width: 320px; height: 200px; object-fit: cover; border-radius: 15px;" />
   
-  <!-- Message caché (optionnel) -->
   <div id="message">🎉 Surprise ! 🎉</div>
   
-  <!-- Canvas pour gratter -->
   <canvas id="scratchCanvas" width="320" height="200"></canvas>
 </div>
 
@@ -70,17 +64,13 @@
   const canvas = document.getElementById('scratchCanvas');
   const ctx = canvas.getContext('2d');
 
-  // Configuration pour les écrans HD
-  function setupCanvas(canvas) {
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = rect.height * dpr;
-    ctx.scale(dpr, dpr);
-  }
-  setupCanvas(canvas);
+  // Fix canvas taille pour correspondre exactement à 320x200
+  canvas.style.width = '320px';
+  canvas.style.height = '200px';
+  canvas.width = 320;
+  canvas.height = 200;
 
-  // Remplir la zone grattable avec un dégradé argenté
+  // Dessine le masque gris métallique
   const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
   gradient.addColorStop(0, '#b0b0b0');
   gradient.addColorStop(0.5, '#d9d9d9');
@@ -134,11 +124,4 @@
     if (!isDrawing) return;
     const pos = getPointerPos(e);
     scratch(pos.x, pos.y);
-    e.preventDefault();
-  });
-
-  canvas.addEventListener('touchend', () => isDrawing = false);
-</script>
-
-</body>
-</html>
+    e.preventDef
