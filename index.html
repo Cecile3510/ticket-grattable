@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8" />
-<title>Carte à gratter cœur strict</title>
+<title>Carte à gratter cœur simplifiée</title>
 <style>
   html, body {
     margin: 0; padding: 0; height: 100vh; width: 100vw;
@@ -59,35 +59,17 @@
     ctx.closePath();
   }
 
-  // Dessine la zone grattable cœur
   function drawScratchArea() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.save();
     drawHeartPath(ctx, canvas.width / 2, 30, 240);
     ctx.clip();
-    ctx.fillStyle = '#bbb';  // gris clair
+    ctx.fillStyle = '#bbb';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.restore();
   }
 
   drawScratchArea();
-
-  // Fonction qui dit si un point (px, py) est dans le cœur dessiné à (x,y) avec taille size
-  function isPointInHeart(px, py, x, y, size) {
-    // On recentre le point par rapport au cœur
-    let dx = px - x;
-    let dy = py - y;
-
-    // Utilisation de la forme paramétrique du cœur (approximative)
-    // On normalise les coordonnées pour vérifier dans la forme "mathématique"
-    dx /= size / 2;
-    dy /= size / 2;
-
-    // Equation du coeur : (x^2 + y^2 - 1)^3 - x^2 y^3 <= 0
-    let val = Math.pow(dx*dx + dy*dy - 1, 3) - dx*dx * dy*dy*dy;
-
-    return val <= 0;
-  }
 
   let isDrawing = false;
 
@@ -102,9 +84,28 @@
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    // On efface uniquement si on est DANS le cœur
-    if (isPointInHeart(x, y, canvas.width / 2, 30 + 120, 240)) { 
-      // 30 + 120 = centre vertical approx du coeur (30 est le top, 240 la taille)
+    // On grattage sans restriction sur forme, juste dans le rectangle du canvas
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.beginPath();
+    ctx.arc(x, y, 20, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalCompositeOperation = 'source-over';
+  });
+
+  // Pour le tactile (mobile)
+  canvas.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    isDrawing = true;
+  });
+  canvas.addEventListener('touchend', () => isDrawing = false);
+  canvas.addEventListener('touchcancel', () => isDrawing = false);
+  canvas.addEventListener('touchmove', (e) => {
+    if (!isDrawing) return;
+    e.preventDefault();
+    const rect = canvas.getBoundingClientRect();
+    for (const touch of e.touches) {
+      const x = touch.clientX - rect.left;
+      const y = touch.clientY - rect.top;
       ctx.globalCompositeOperation = 'destination-out';
       ctx.beginPath();
       ctx.arc(x, y, 20, 0, Math.PI * 2);
