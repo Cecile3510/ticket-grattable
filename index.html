@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Carte à gratter en forme de cœur</title>
+<title>Carte à gratter en forme de cœur plus grand</title>
 <style>
   body {
     margin:0; padding:0; background:#f5f5f5;
@@ -24,19 +24,18 @@
   #scratchCanvas {
     position: absolute;
     width: 300px;
-    height: 120px;
-    top: calc(50% - 60px);
+    height: 150px; /* hauteur modifiée */
+    top: calc(50% - 75px); /* centrer verticalement avec nouvelle hauteur */
     left: calc(50% - 150px);
     cursor: pointer;
     z-index: 2;
-    /* Pas de border-radius pour garder forme cœur nette */
   }
 </style>
 </head>
 <body>
 
 <div id="card">
-  <canvas id="scratchCanvas" width="300" height="120"></canvas>
+  <canvas id="scratchCanvas" width="300" height="150"></canvas>
 </div>
 
 <script>
@@ -44,32 +43,27 @@
   const ctx = canvas.getContext('2d');
 
   canvas.width = 300;
-  canvas.height = 120;
+  canvas.height = 150;
 
-  // Fonction pour dessiner un coeur centré dans le canvas
   function drawHeart(ctx, x, y, width, height) {
     ctx.beginPath();
     const topCurveHeight = height * 0.3;
     ctx.moveTo(x, y + topCurveHeight);
-    // côté gauche
     ctx.bezierCurveTo(
       x, y,
       x - width / 2, y,
       x - width / 2, y + topCurveHeight
     );
-    // bas du cœur
     ctx.bezierCurveTo(
       x - width / 2, y + (height + topCurveHeight) / 2,
       x, y + (height + topCurveHeight) / 1.5,
       x, y + height
     );
-    // côté droit
     ctx.bezierCurveTo(
       x, y + (height + topCurveHeight) / 1.5,
       x + width / 2, y + (height + topCurveHeight) / 2,
       x + width / 2, y + topCurveHeight
     );
-    // sommet droit
     ctx.bezierCurveTo(
       x + width / 2, y,
       x, y,
@@ -78,16 +72,13 @@
     ctx.closePath();
   }
 
-  // Dessiner masque métallique en forme de cœur
   function drawMetallicHeartMask() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // dessiner forme coeur comme masque
     ctx.save();
-    drawHeart(ctx, canvas.width / 2, 10, 200, 100);
+    drawHeart(ctx, canvas.width / 2, 10, 200, 150);
     ctx.clip();
 
-    // dégradé métallique
     const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
     gradient.addColorStop(0, '#b0b0b0');
     gradient.addColorStop(0.25, '#d9d9d9');
@@ -97,7 +88,6 @@
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // rayures fines
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
     ctx.lineWidth = 1;
     for(let i = -canvas.height; i < canvas.width; i += 6) {
@@ -129,16 +119,13 @@
   }
 
   function isInsideHeart(x, y) {
-    // Pour ne permettre de gratter que dans la zone du coeur
-    // On teste si le pixel est opaque (alpha>0) dans la zone cœur
-    // Ici on va tester en utilisant isPointInPath
     ctx.beginPath();
-    drawHeart(ctx, canvas.width / 2, 10, 200, 100);
+    drawHeart(ctx, canvas.width / 2, 10, 200, 150);
     return ctx.isPointInPath(x, y);
   }
 
   function scratch(x, y) {
-    if (!isInsideHeart(x, y)) return; // pas dans le cœur => on ne gratte pas
+    if (!isInsideHeart(x, y)) return;
 
     ctx.globalCompositeOperation = 'destination-out';
     ctx.beginPath();
