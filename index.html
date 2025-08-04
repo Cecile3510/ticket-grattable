@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8" />
-<title>Carte à gratter cœur sans bordure</title>
+<title>Carte à gratter cœur strict</title>
 <style>
   html, body {
     margin: 0; padding: 0; height: 100vh; width: 100vw;
@@ -26,7 +26,7 @@
   }
   #scratchCanvas {
     position: absolute;
-    top: 580px;  /* ajuste la position verticale */
+    top: 580px;
     left: 50%;
     transform: translateX(-50%);
     width: 300px;
@@ -48,11 +48,70 @@
   const canvas = document.getElementById('scratchCanvas');
   const ctx = canvas.getContext('2d');
 
-  // Dessine un cœur (zone à gratter)
   function drawHeartPath(ctx, x, y, size) {
     ctx.beginPath();
     const topCurveHeight = size * 0.3;
     ctx.moveTo(x, y + topCurveHeight);
     ctx.bezierCurveTo(x, y, x - size / 2, y, x - size / 2, y + topCurveHeight);
     ctx.bezierCurveTo(x - size / 2, y + size / 1.5, x, y + size, x, y + size);
-    ctx.bezierCurveTo(x, y + size, x + size / 2, y + size / 1.5, x + s
+    ctx.bezierCurveTo(x, y + size, x + size / 2, y + size / 1.5, x + size / 2, y + topCurveHeight);
+    ctx.bezierCurveTo(x + size / 2, y, x, y, x, y + topCurveHeight);
+    ctx.closePath();
+  }
+
+  // Dessine la zone grattable cœur
+  function drawScratchArea() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.save();
+    drawHeartPath(ctx, canvas.width / 2, 30, 240);
+    ctx.clip();
+    ctx.fillStyle = '#bbb';  // gris clair
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.restore();
+  }
+
+  drawScratchArea();
+
+  // Fonction qui dit si un point (px, py) est dans le cœur dessiné à (x,y) avec taille size
+  function isPointInHeart(px, py, x, y, size) {
+    // On recentre le point par rapport au cœur
+    let dx = px - x;
+    let dy = py - y;
+
+    // Utilisation de la forme paramétrique du cœur (approximative)
+    // On normalise les coordonnées pour vérifier dans la forme "mathématique"
+    dx /= size / 2;
+    dy /= size / 2;
+
+    // Equation du coeur : (x^2 + y^2 - 1)^3 - x^2 y^3 <= 0
+    let val = Math.pow(dx*dx + dy*dy - 1, 3) - dx*dx * dy*dy*dy;
+
+    return val <= 0;
+  }
+
+  let isDrawing = false;
+
+  canvas.addEventListener('mousedown', () => isDrawing = true);
+  canvas.addEventListener('mouseup', () => isDrawing = false);
+  canvas.addEventListener('mouseleave', () => isDrawing = false);
+
+  canvas.addEventListener('mousemove', (e) => {
+    if (!isDrawing) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    // On efface uniquement si on est DANS le cœur
+    if (isPointInHeart(x, y, canvas.width / 2, 30 + 120, 240)) { 
+      // 30 + 120 = centre vertical approx du coeur (30 est le top, 240 la taille)
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.beginPath();
+      ctx.arc(x, y, 20, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalCompositeOperation = 'source-over';
+    }
+  });
+</script>
+</body>
+</html>
