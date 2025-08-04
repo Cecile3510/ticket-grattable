@@ -4,25 +4,23 @@
 <meta charset="UTF-8" />
 <title>Carte à gratter cœur</title>
 <style>
-  html, body {
-    margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden;
-  }
-  body {
-    background: url('images/fille ou garcon v2.png') no-repeat center center;
-    background-size: auto; /* Garde taille réelle */
-  background-position: center top; /* Centré horizontalement, aligné en haut */
-  background-repeat: no-repeat;
+  body, html {
+    margin: 0; padding: 0; height: 100vh; display: flex; justify-content: center; align-items: center; background: #222;
   }
   #container {
     position: relative;
     width: 1080px;
     height: 1920px;
-    margin: auto;
+    background: url('images/fille-ou-garcon-v2.png') no-repeat center top;
+    background-size: auto;
+    box-shadow: 0 0 15px rgba(0,0,0,0.6);
   }
   canvas {
     position: absolute;
     top: 50%;
     left: 50%;
+    width: 300px;
+    height: 300px;
     transform: translate(-50%, -50%);
     cursor: pointer;
   }
@@ -34,78 +32,52 @@
   </div>
 
 <script>
-const canvas = document.getElementById('scratchCanvas');
-const ctx = canvas.getContext('2d');
+  const canvas = document.getElementById('scratchCanvas');
+  const ctx = canvas.getContext('2d');
 
-// Dessiner la forme du cœur (au centre du canvas)
-function drawHeartPath(ctx, x, y, size) {
-  ctx.beginPath();
-  const topCurveHeight = size * 0.3;
-  ctx.moveTo(x, y + topCurveHeight);
-  ctx.bezierCurveTo(
-    x, y,
-    x - size / 2, y,
-    x - size / 2, y + topCurveHeight
-  );
-  ctx.bezierCurveTo(
-    x - size / 2, y + size / 1.5,
-    x, y + size,
-    x, y + size
-  );
-  ctx.bezierCurveTo(
-    x, y + size,
-    x + size / 2, y + size / 1.5,
-    x + size / 2, y + topCurveHeight
-  );
-  ctx.bezierCurveTo(
-    x + size / 2, y,
-    x, y,
-    x, y + topCurveHeight
-  );
-  ctx.closePath();
-}
+  function drawHeart(ctx, x, y, size) {
+    ctx.beginPath();
+    const topCurveHeight = size * 0.3;
+    ctx.moveTo(x, y + topCurveHeight);
+    ctx.bezierCurveTo(x, y, x - size / 2, y, x - size / 2, y + topCurveHeight);
+    ctx.bezierCurveTo(x - size / 2, y + size / 1.5, x, y + size, x, y + size);
+    ctx.bezierCurveTo(x, y + size, x + size / 2, y + size / 1.5, x + size / 2, y + topCurveHeight);
+    ctx.bezierCurveTo(x + size / 2, y, x, y, x, y + topCurveHeight);
+    ctx.closePath();
+  }
 
-// Remplir la zone grattable
-function drawScratchArea() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.save();
-  drawHeartPath(ctx, canvas.width / 2, 30, 240);
-  ctx.clip();
-  ctx.fillStyle = '#aaa'; // Couleur de la surface à gratter
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.restore();
-}
+  function drawScratchArea() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.save();
+    drawHeart(ctx, canvas.width / 2, 30, 240);
+    ctx.clip();
+    ctx.fillStyle = '#bbb';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.restore();
+  }
 
-// Initialisation
-drawScratchArea();
+  drawScratchArea();
 
-let isDrawing = false;
+  let isDrawing = false;
 
-canvas.addEventListener('mousedown', () => isDrawing = true);
-canvas.addEventListener('mouseup', () => isDrawing = false);
-canvas.addEventListener('mouseleave', () => isDrawing = false);
+  canvas.addEventListener('mousedown', () => isDrawing = true);
+  canvas.addEventListener('mouseup', () => isDrawing = false);
+  canvas.addEventListener('mouseleave', () => isDrawing = false);
 
-canvas.addEventListener('mousemove', (e) => {
-  if (!isDrawing) return;
-
-  const rect = canvas.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
-
-  ctx.save();
-  drawHeartPath(ctx, canvas.width / 2, 30, 240);
-  ctx.clip();
-
-  ctx.globalCompositeOperation = 'destination-out';
-  ctx.beginPath();
-  ctx.arc(x, y, 15, 0, 2 * Math.PI);
-  ctx.fill();
-
-  ctx.restore();
-});
+  canvas.addEventListener('mousemove', (e) => {
+    if (!isDrawing) return;
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    ctx.save();
+    drawHeart(ctx, canvas.width / 2, 30, 240);
+    ctx.clip();
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.beginPath();
+    ctx.arc(x, y, 20, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.restore();
+  });
 </script>
 </body>
 </html>
-
-
-
