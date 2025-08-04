@@ -2,34 +2,39 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8" />
-<title>Carte à gratter cœur</title>
+<title>Carte à gratter cœur - format centré</title>
 <style>
   html, body {
-    margin: 0; padding: 0; height: 100vh; width: 100vw; background: #222;
+    margin: 0; padding: 0; height: 100vh; width: 100vw;
+    background: #222;
     display: flex; justify-content: center; align-items: center;
+    font-family: Arial, sans-serif;
   }
-  #container {
+  #carte {
     position: relative;
-    width: 1080px;
-    height: 1920px;
-    background: url('images/fille-ou-garcon-v2.png') no-repeat center top;
+    width: 450px;   /* largeur carte */
+    height: 800px;  /* hauteur carte */
+    background: url('images/fille-ou-garcon-v2.png') no-repeat center center;
     background-size: contain;
-    box-shadow: 0 0 15px rgba(0,0,0,0.6);
+    box-shadow: 0 0 20px rgba(0,0,0,0.7);
+    border-radius: 20px;
+    overflow: hidden;
   }
   canvas {
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 300px;
-    height: 300px;
+    width: 200px;  /* taille zone à gratter */
+    height: 200px;
     transform: translate(-50%, -50%);
     cursor: pointer;
+    border-radius: 50%; /* pour lisser les bords du canvas */
   }
 </style>
 </head>
 <body>
-  <div id="container">
-    <canvas id="scratchCanvas" width="300" height="300"></canvas>
+  <div id="carte">
+    <canvas id="scratchCanvas" width="200" height="200"></canvas>
   </div>
 
 <script>
@@ -42,43 +47,4 @@
     ctx.moveTo(x, y + topCurveHeight);
     ctx.bezierCurveTo(x, y, x - size / 2, y, x - size / 2, y + topCurveHeight);
     ctx.bezierCurveTo(x - size / 2, y + size / 1.5, x, y + size, x, y + size);
-    ctx.bezierCurveTo(x, y + size, x + size / 2, y + size / 1.5, x + size / 2, y + topCurveHeight);
-    ctx.bezierCurveTo(x + size / 2, y, x, y, x, y + topCurveHeight);
-    ctx.closePath();
-  }
-
-  function drawScratchArea() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.save();
-    drawHeart(ctx, canvas.width / 2, 30, 240);
-    ctx.clip();
-    ctx.fillStyle = '#bbb';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.restore();
-  }
-
-  drawScratchArea();
-
-  let isDrawing = false;
-
-  canvas.addEventListener('mousedown', () => isDrawing = true);
-  canvas.addEventListener('mouseup', () => isDrawing = false);
-  canvas.addEventListener('mouseleave', () => isDrawing = false);
-
-  canvas.addEventListener('mousemove', (e) => {
-    if (!isDrawing) return;
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    ctx.save();
-    drawHeart(ctx, canvas.width / 2, 30, 240);
-    ctx.clip();
-    ctx.globalCompositeOperation = 'destination-out';
-    ctx.beginPath();
-    ctx.arc(x, y, 20, 0, 2 * Math.PI);
-    ctx.fill();
-    ctx.restore();
-  });
-</script>
-</body>
-</html>
+    ctx.bezierCurveTo(x, y + size, x + size / 2, y + size / 1.5, x + size /
