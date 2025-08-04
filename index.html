@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8" />
-<title>Carte à gratter cœur simplifiée</title>
+<title>Carte à gratter cœur plus petite</title>
 <style>
   html, body {
     margin: 0; padding: 0; height: 100vh; width: 100vw;
@@ -11,8 +11,8 @@
   }
   #card {
     position: relative;
-    width: 600px;
-    height: 1200px;
+    width: 360px;       /* largeur réduite */
+    height: 720px;      /* hauteur réduite */
     background: white;
     box-shadow: 0 10px 30px rgba(0,0,0,0.4);
     border-radius: 15px;
@@ -26,11 +26,11 @@
   }
   #scratchCanvas {
     position: absolute;
-    top: 580px;
+    top: 345px;            /* ajusté pour rester centré verticalement */
     left: 50%;
     transform: translateX(-50%);
-    width: 300px;
-    height: 270px;
+    width: 180px;          /* moitié de la largeur initiale */
+    height: 162px;         /* moitié de la hauteur initiale */
     cursor: pointer;
     background: transparent;
     border: none;
@@ -41,7 +41,7 @@
 <body>
   <div id="card">
     <img id="backgroundImage" src="images/fille-ou-garcon-v2.png" alt="Carte annonce sexe bébé" />
-    <canvas id="scratchCanvas" width="300" height="270"></canvas>
+    <canvas id="scratchCanvas" width="180" height="162"></canvas>
   </div>
 
 <script>
@@ -62,7 +62,7 @@
   function drawScratchArea() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.save();
-    drawHeartPath(ctx, canvas.width / 2, 30, 240);
+    drawHeartPath(ctx, canvas.width / 2, 20, 140);  // taille et position adaptés au canvas réduit
     ctx.clip();
     ctx.fillStyle = '#bbb';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -84,15 +84,14 @@
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    // On grattage sans restriction sur forme, juste dans le rectangle du canvas
     ctx.globalCompositeOperation = 'destination-out';
     ctx.beginPath();
-    ctx.arc(x, y, 20, 0, Math.PI * 2);
+    ctx.arc(x, y, 12, 0, Math.PI * 2);  // rayon plus petit
     ctx.fill();
     ctx.globalCompositeOperation = 'source-over';
   });
 
-  // Pour le tactile (mobile)
+  // Support tactile
   canvas.addEventListener('touchstart', (e) => {
     e.preventDefault();
     isDrawing = true;
@@ -102,17 +101,3 @@
   canvas.addEventListener('touchmove', (e) => {
     if (!isDrawing) return;
     e.preventDefault();
-    const rect = canvas.getBoundingClientRect();
-    for (const touch of e.touches) {
-      const x = touch.clientX - rect.left;
-      const y = touch.clientY - rect.top;
-      ctx.globalCompositeOperation = 'destination-out';
-      ctx.beginPath();
-      ctx.arc(x, y, 20, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.globalCompositeOperation = 'source-over';
-    }
-  });
-</script>
-</body>
-</html>
