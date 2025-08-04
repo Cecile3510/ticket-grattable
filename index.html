@@ -3,101 +3,84 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Carte à gratter digitale - version améliorée</title>
+<title>Carte à gratter digitale - style Persee Graphisme</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Roboto:wght@400;700&display=swap');
-
   body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f5f5f5;
     margin: 0; padding: 0;
-    font-family: 'Roboto', sans-serif;
-    background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%);
+    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    flex-direction: column;
   }
-  h1 {
-    font-family: 'Pacifico', cursive;
-    color: #d81b60;
-    margin-bottom: 5px;
-    font-size: 2.8rem;
-  }
-  #scratch-area {
+  #card {
     position: relative;
     width: 320px;
-    height: 170px;
+    height: 200px;
     background: #fff;
-    border-radius: 20px;
-    box-shadow: 0 10px 20px rgba(216, 27, 96, 0.3);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    border-radius: 15px;
     overflow: hidden;
+    user-select: none;
   }
-  #secret-text {
+  #message {
     position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 2rem;
+    width: 100%;
+    height: 100%;
+    font-size: 1.8rem;
     font-weight: 700;
-    color: #880e4f;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
     text-align: center;
-    padding: 0 20px;
-  }
-  #scratch-canvas {
-    position: absolute;
-    top: 0; left: 0;
-    width: 320px;
-    height: 170px;
-    border-radius: 20px;
-    background: linear-gradient(135deg, #ad1457, #d81b60);
-    cursor: pointer;
-    z-index: 2;
-    touch-action: none;
-  }
-  #instruction {
-    margin-top: 18px;
-    color: #880e4f;
-    font-style: italic;
-    font-weight: 500;
-  }
-  /* Petite déco confettis */
-  #confettis {
-    position: absolute;
-    width: 320px;
-    height: 170px;
     pointer-events: none;
+  }
+  canvas {
+    position: absolute;
     top: 0; left: 0;
-    z-index: 3;
+    width: 320px;
+    height: 200px;
+    border-radius: 15px;
+    cursor: pointer;
+    background: linear-gradient(135deg, #a5a5a5, #d9d9d9);
   }
 </style>
 </head>
 <body>
-<h1>Surprise à gratter !</h1>
-<div id="scratch-area">
-  <canvas id="confettis"></canvas>
-  <div id="secret-text">🎁 C’est une fille ! 🎁</div>
-  <canvas id="scratch-canvas" width="320" height="170"></canvas>
+
+<div id="card">
+  <div id="message">🎉 C’est un garçon ! 🎉</div>
+  <canvas id="scratchCanvas" width="320" height="200"></canvas>
 </div>
-<div id="instruction">Gratte avec ta souris ou ton doigt ↓</div>
 
 <script>
-  const canvas = document.getElementById('scratch-canvas');
+  const canvas = document.getElementById('scratchCanvas');
   const ctx = canvas.getContext('2d');
-  const secretText = document.getElementById('secret-text');
 
-  // Confettis canvas setup
-  const confettiCanvas = document.getElementById('confettis');
-  const confettiCtx = confettiCanvas.getContext('2d');
-  confettiCanvas.width = canvas.width;
-  confettiCanvas.height = canvas.height;
+  // Setup canvas size (for high DPI screens)
+  function setupCanvas(canvas) {
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+  }
+  setupCanvas(canvas);
 
-  // Brush settings
-  const brushRadius = 25;
-
-  // Dessiner la surface à gratter
-  ctx.fillStyle = '#ad1457';
+  // Fill the canvas with a metallic silver gradient (mask)
+  const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+  gradient.addColorStop(0, '#b0b0b0');
+  gradient.addColorStop(0.5, '#d9d9d9');
+  gradient.addColorStop(1, '#a5a5a5');
+  ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // Variables grattage
+  // Brush size
+  const brushRadius = 30;
+
   let isDrawing = false;
 
   function getPointerPos(e) {
@@ -122,25 +105,24 @@
     ctx.globalCompositeOperation = 'source-over';
   }
 
-  // Gestion de la souris / tactile
   canvas.addEventListener('mousedown', () => isDrawing = true);
   canvas.addEventListener('mouseup', () => isDrawing = false);
   canvas.addEventListener('mouseleave', () => isDrawing = false);
 
-  canvas.addEventListener('mousemove', (e) => {
+  canvas.addEventListener('mousemove', e => {
     if (!isDrawing) return;
     const pos = getPointerPos(e);
     scratch(pos.x, pos.y);
   });
 
-  canvas.addEventListener('touchstart', (e) => {
+  canvas.addEventListener('touchstart', e => {
     isDrawing = true;
     const pos = getPointerPos(e);
     scratch(pos.x, pos.y);
     e.preventDefault();
   });
 
-  canvas.addEventListener('touchmove', (e) => {
+  canvas.addEventListener('touchmove', e => {
     if (!isDrawing) return;
     const pos = getPointerPos(e);
     scratch(pos.x, pos.y);
@@ -148,52 +130,7 @@
   });
 
   canvas.addEventListener('touchend', () => isDrawing = false);
-
-  // Animation confettis simple
-  const confettis = [];
-  const colors = ['#f48fb1','#ce93d8','#f06292','#ba68c8','#e1bee7'];
-  const maxConfettis = 50;
-
-  function createConfetti() {
-    return {
-      x: Math.random() * confettiCanvas.width,
-      y: Math.random() * confettiCanvas.height,
-      r: Math.random() * 4 + 2,
-      d: Math.random() * maxConfettis,
-      color: colors[Math.floor(Math.random() * colors.length)],
-      tilt: Math.random() * 10 - 10,
-      tiltAngle: 0,
-      tiltAngleIncrement: Math.random() * 0.1 + 0.05,
-    };
-  }
-
-  for (let i = 0; i < maxConfettis; i++) {
-    confettis.push(createConfetti());
-  }
-
-  function drawConfettis() {
-    confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
-    confettis.forEach((c) => {
-      confettiCtx.beginPath();
-      confettiCtx.lineWidth = c.r;
-      confettiCtx.strokeStyle = c.color;
-      confettiCtx.moveTo(c.x + c.tilt + c.r / 2, c.y);
-      confettiCtx.lineTo(c.x + c.tilt, c.y + c.tilt + c.r / 2);
-      confettiCtx.stroke();
-
-      c.tiltAngle += c.tiltAngleIncrement;
-      c.y += (Math.cos(c.d) + 3 + c.r / 2) / 2;
-      c.x += Math.sin(c.tiltAngle);
-
-      if (c.x > confettiCanvas.width + 20 || c.x < -20 || c.y > confettiCanvas.height) {
-        c.x = Math.random() * confettiCanvas.width;
-        c.y = -10;
-        c.tilt = Math.random() * 10 - 10;
-      }
-    });
-    requestAnimationFrame(drawConfettis);
-  }
-  drawConfettis();
 </script>
+
 </body>
 </html>
