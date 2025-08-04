@@ -4,15 +4,16 @@
 <meta charset="UTF-8" />
 <title>Carte à gratter cœur</title>
 <style>
-  body, html {
-    margin: 0; padding: 0; height: 100vh; display: flex; justify-content: center; align-items: center; background: #222;
+  html, body {
+    margin: 0; padding: 0; height: 100vh; width: 100vw; background: #222;
+    display: flex; justify-content: center; align-items: center;
   }
   #container {
     position: relative;
     width: 1080px;
     height: 1920px;
     background: url('images/fille-ou-garcon-v2.png') no-repeat center top;
-    background-size: auto;
+    background-size: contain;
     box-shadow: 0 0 15px rgba(0,0,0,0.6);
   }
   canvas {
