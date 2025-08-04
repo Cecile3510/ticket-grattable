@@ -1,133 +1,199 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Carte à gratter digitale</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #ffeef8;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-      flex-direction: column;
-    }
-    h1 {
-      color: #e91e63;
-      margin-bottom: 10px;
-    }
-    #scratch-area {
-      position: relative;
-      width: 300px;
-      height: 150px;
-      background: #f8bbd0;
-      border-radius: 15px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-      user-select: none;
-      cursor: pointer;
-      overflow: hidden;
-    }
-    #secret-text {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 1.8rem;
-      font-weight: bold;
-      color: #880e4f;
-      z-index: 1;
-      padding: 10px 20px;
-      text-align: center;
-    }
-    #scratch-canvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 300px;
-      height: 150px;
-      border-radius: 15px;
-      background: linear-gradient(135deg, #b71c1c, #d32f2f);
-      z-index: 2;
-      touch-action: none;
-    }
-    #instruction {
-      margin-top: 20px;
-      font-style: italic;
-      color: #ad1457;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Carte à gratter digitale - version améliorée</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Roboto:wght@400;700&display=swap');
+
+  body {
+    margin: 0; padding: 0;
+    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    flex-direction: column;
+  }
+  h1 {
+    font-family: 'Pacifico', cursive;
+    color: #d81b60;
+    margin-bottom: 5px;
+    font-size: 2.8rem;
+  }
+  #scratch-area {
+    position: relative;
+    width: 320px;
+    height: 170px;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 10px 20px rgba(216, 27, 96, 0.3);
+    overflow: hidden;
+  }
+  #secret-text {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2rem;
+    font-weight: 700;
+    color: #880e4f;
+    text-align: center;
+    padding: 0 20px;
+  }
+  #scratch-canvas {
+    position: absolute;
+    top: 0; left: 0;
+    width: 320px;
+    height: 170px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #ad1457, #d81b60);
+    cursor: pointer;
+    z-index: 2;
+    touch-action: none;
+  }
+  #instruction {
+    margin-top: 18px;
+    color: #880e4f;
+    font-style: italic;
+    font-weight: 500;
+  }
+  /* Petite déco confettis */
+  #confettis {
+    position: absolute;
+    width: 320px;
+    height: 170px;
+    pointer-events: none;
+    top: 0; left: 0;
+    z-index: 3;
+  }
+</style>
 </head>
 <body>
-  <h1>Carte à gratter digitale</h1>
-  <div id="scratch-area">
-    <div id="secret-text">🎉 C’est une fille ! 🎉</div>
-    <canvas id="scratch-canvas" width="300" height="150"></canvas>
-  </div>
-  <div id="instruction">Gratte avec ta souris ou ton doigt ici ↓</div>
+<h1>Surprise à gratter !</h1>
+<div id="scratch-area">
+  <canvas id="confettis"></canvas>
+  <div id="secret-text">🎁 C’est une fille ! 🎁</div>
+  <canvas id="scratch-canvas" width="320" height="170"></canvas>
+</div>
+<div id="instruction">Gratte avec ta souris ou ton doigt ↓</div>
 
-  <script>
-    const canvas = document.getElementById('scratch-canvas');
-    const ctx = canvas.getContext('2d');
-    let isDrawing = false;
+<script>
+  const canvas = document.getElementById('scratch-canvas');
+  const ctx = canvas.getContext('2d');
+  const secretText = document.getElementById('secret-text');
 
-    // Remplir le canvas avec une couleur opaque (zone à gratter)
-    ctx.fillStyle = '#b71c1c';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  // Confettis canvas setup
+  const confettiCanvas = document.getElementById('confettis');
+  const confettiCtx = confettiCanvas.getContext('2d');
+  confettiCanvas.width = canvas.width;
+  confettiCanvas.height = canvas.height;
 
-    // Définir la taille de la "gomme"
-    const brushRadius = 20;
+  // Brush settings
+  const brushRadius = 25;
 
-    function getPointerPos(e) {
-      const rect = canvas.getBoundingClientRect();
-      let x, y;
-      if (e.touches) {
-        x = e.touches[0].clientX - rect.left;
-        y = e.touches[0].clientY - rect.top;
-      } else {
-        x = e.clientX - rect.left;
-        y = e.clientY - rect.top;
+  // Dessiner la surface à gratter
+  ctx.fillStyle = '#ad1457';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Variables grattage
+  let isDrawing = false;
+
+  function getPointerPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    let x, y;
+    if (e.touches) {
+      x = e.touches[0].clientX - rect.left;
+      y = e.touches[0].clientY - rect.top;
+    } else {
+      x = e.clientX - rect.left;
+      y = e.clientY - rect.top;
+    }
+    return { x, y };
+  }
+
+  function scratch(x, y) {
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.beginPath();
+    ctx.arc(x, y, brushRadius, 0, Math.PI * 2, true);
+    ctx.fill();
+    ctx.closePath();
+    ctx.globalCompositeOperation = 'source-over';
+  }
+
+  // Gestion de la souris / tactile
+  canvas.addEventListener('mousedown', () => isDrawing = true);
+  canvas.addEventListener('mouseup', () => isDrawing = false);
+  canvas.addEventListener('mouseleave', () => isDrawing = false);
+
+  canvas.addEventListener('mousemove', (e) => {
+    if (!isDrawing) return;
+    const pos = getPointerPos(e);
+    scratch(pos.x, pos.y);
+  });
+
+  canvas.addEventListener('touchstart', (e) => {
+    isDrawing = true;
+    const pos = getPointerPos(e);
+    scratch(pos.x, pos.y);
+    e.preventDefault();
+  });
+
+  canvas.addEventListener('touchmove', (e) => {
+    if (!isDrawing) return;
+    const pos = getPointerPos(e);
+    scratch(pos.x, pos.y);
+    e.preventDefault();
+  });
+
+  canvas.addEventListener('touchend', () => isDrawing = false);
+
+  // Animation confettis simple
+  const confettis = [];
+  const colors = ['#f48fb1','#ce93d8','#f06292','#ba68c8','#e1bee7'];
+  const maxConfettis = 50;
+
+  function createConfetti() {
+    return {
+      x: Math.random() * confettiCanvas.width,
+      y: Math.random() * confettiCanvas.height,
+      r: Math.random() * 4 + 2,
+      d: Math.random() * maxConfettis,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      tilt: Math.random() * 10 - 10,
+      tiltAngle: 0,
+      tiltAngleIncrement: Math.random() * 0.1 + 0.05,
+    };
+  }
+
+  for (let i = 0; i < maxConfettis; i++) {
+    confettis.push(createConfetti());
+  }
+
+  function drawConfettis() {
+    confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+    confettis.forEach((c) => {
+      confettiCtx.beginPath();
+      confettiCtx.lineWidth = c.r;
+      confettiCtx.strokeStyle = c.color;
+      confettiCtx.moveTo(c.x + c.tilt + c.r / 2, c.y);
+      confettiCtx.lineTo(c.x + c.tilt, c.y + c.tilt + c.r / 2);
+      confettiCtx.stroke();
+
+      c.tiltAngle += c.tiltAngleIncrement;
+      c.y += (Math.cos(c.d) + 3 + c.r / 2) / 2;
+      c.x += Math.sin(c.tiltAngle);
+
+      if (c.x > confettiCanvas.width + 20 || c.x < -20 || c.y > confettiCanvas.height) {
+        c.x = Math.random() * confettiCanvas.width;
+        c.y = -10;
+        c.tilt = Math.random() * 10 - 10;
       }
-      return { x, y };
-    }
-
-    function scratch(x, y) {
-      ctx.globalCompositeOperation = 'destination-out';
-      ctx.beginPath();
-      ctx.arc(x, y, brushRadius, 0, 2 * Math.PI);
-      ctx.fill();
-      ctx.closePath();
-      ctx.globalCompositeOperation = 'source-over';
-    }
-
-    canvas.addEventListener('mousedown', () => isDrawing = true);
-    canvas.addEventListener('mouseup', () => isDrawing = false);
-    canvas.addEventListener('mouseleave', () => isDrawing = false);
-
-    canvas.addEventListener('mousemove', (e) => {
-      if (!isDrawing) return;
-      const pos = getPointerPos(e);
-      scratch(pos.x, pos.y);
     });
-
-    // Pour tactile
-    canvas.addEventListener('touchstart', (e) => {
-      isDrawing = true;
-      const pos = getPointerPos(e);
-      scratch(pos.x, pos.y);
-      e.preventDefault();
-    });
-
-    canvas.addEventListener('touchmove', (e) => {
-      if (!isDrawing) return;
-      const pos = getPointerPos(e);
-      scratch(pos.x, pos.y);
-      e.preventDefault();
-    });
-
-    canvas.addEventListener('touchend', () => isDrawing = false);
-  </script>
+    requestAnimationFrame(drawConfettis);
+  }
+  drawConfettis();
+</script>
 </body>
 </html>
