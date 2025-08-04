@@ -1,127 +1,76 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <title>Fille ou garçon ?</title>
+  <meta charset="UTF-8">
+  <title>Fille ou Garçon ?</title>
   <style>
     html, body {
       margin: 0;
       padding: 0;
+      overflow: hidden;
       width: 100%;
       height: 100%;
-      overflow: hidden;
     }
-
-    body {
-      background: url("fille ou garcon v2.png") no-repeat center center;
-      background-size: cover;
+    #container {
       position: relative;
       width: 1080px;
       height: 1920px;
+      margin: auto;
+      background-image: url('fille ou garcon v2.png');
+      background-size: cover;
+      background-position: center;
     }
-
-    #container {
+    canvas {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-    }
-
-    #scratchCanvas {
-      border-radius: 0;
-      cursor: pointer;
-    }
-
-    #hiddenText {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 50px;
-      color: #d6336c;
-      font-weight: bold;
-      text-align: center;
-      pointer-events: none;
+      pointer-events: auto;
     }
   </style>
 </head>
 <body>
   <div id="container">
-    <div id="hiddenText">🎀 C’est une fille !</div>
-    <canvas id="scratchCanvas" width="300" height="300"></canvas>
+    <canvas id="scratchCanvas" width="400" height="400"></canvas>
   </div>
 
   <script>
     const canvas = document.getElementById('scratchCanvas');
     const ctx = canvas.getContext('2d');
 
-    // Dessine une forme de cœur
-    function drawHeartClip(ctx, x, y, size) {
-      ctx.beginPath();
-      const topCurveHeight = size * 0.3;
-      ctx.moveTo(x, y + topCurveHeight);
-      ctx.bezierCurveTo(
-        x, y,
-        x - size / 2, y,
-        x - size / 2, y + topCurveHeight
-      );
-      ctx.bezierCurveTo(
-        x - size / 2, y + size / 1.5,
-        x, y + size,
-        x, y + size
-      );
-      ctx.bezierCurveTo(
-        x, y + size,
-        x + size / 2, y + size / 1.5,
-        x + size / 2, y + topCurveHeight
-      );
-      ctx.bezierCurveTo(
-        x + size / 2, y,
-        x, y,
-        x, y + topCurveHeight
-      );
-      ctx.closePath();
-    }
+    const heartImage = new Image();
+    heartImage.src = 'coeur.png'; // image en forme de cœur
 
-    // Remplit la forme du cœur avec la surface à gratter
-    function drawScratchSurface() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.save();
-      drawHeartClip(ctx, canvas.width / 2, 30, 200);
-      ctx.clip();
-      ctx.fillStyle = '#CCCCCC'; // gris
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.restore();
-    }
-
-    drawScratchSurface();
+    heartImage.onload = () => {
+      ctx.drawImage(heartImage, 0, 0, canvas.width, canvas.height);
+    };
 
     let isDrawing = false;
 
-    function getMousePos(canvas, e) {
+    function getPosition(e) {
       const rect = canvas.getBoundingClientRect();
-      return {
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top
-      };
+      const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+      const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+      return { x, y };
+    }
+
+    function scratch(e) {
+      if (!isDrawing) return;
+      e.preventDefault();
+      const pos = getPosition(e);
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.beginPath();
+      ctx.arc(pos.x, pos.y, 20, 0, Math.PI * 2, false);
+      ctx.fill();
     }
 
     canvas.addEventListener('mousedown', () => isDrawing = true);
     canvas.addEventListener('mouseup', () => isDrawing = false);
-    canvas.addEventListener('mouseleave', () => isDrawing = false);
+    canvas.addEventListener('mousemove', scratch);
 
-    canvas.addEventListener('mousemove', function(e) {
-      if (!isDrawing) return;
-      const pos = getMousePos(canvas, e);
-      ctx.save();
-      drawHeartClip(ctx, canvas.width / 2, 30, 200);
-      ctx.clip();
-      ctx.globalCompositeOperation = 'destination-out';
-      ctx.beginPath();
-      ctx.arc(pos.x, pos.y, 15, 0, 2 * Math.PI);
-      ctx.fill();
-      ctx.restore();
-    });
+    canvas.addEventListener('touchstart', () => isDrawing = true);
+    canvas.addEventListener('touchend', () => isDrawing = false);
+    canvas.addEventListener('touchmove', scratch);
   </script>
 </body>
 </html>
