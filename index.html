@@ -1,118 +1,80 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <title>Fille ou Garçon ?</title>
+  <meta charset="UTF-8">
+  <title>Ticket à gratter</title>
   <style>
     body {
-      margin: 0;
-      background: #000;
+      background-color: #222;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
+      margin: 0;
     }
-
-    canvas {
+    #scratch-container {
+      position: relative;
+      width: 300px;
+      height: 300px;
+    }
+    #result {
       position: absolute;
       top: 0;
       left: 0;
-      cursor: pointer;
-    }
-
-    #container {
-      position: relative;
-      max-width: 100%;
-      max-height: 100%;
-    }
-
-    img {
-      display: block;
       width: 100%;
-      height: auto;
+      height: 100%;
+      background: white;
+      color: #333;
+      font-size: 24px;
+      font-weight: bold;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 0;
+    }
+    #scratch {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+      cursor: crosshair;
     }
   </style>
 </head>
 <body>
-  <div id="container">
-    <img id="revealImage" src="fille%20ou%20garcon%20v2.png" alt="Ticket à gratter">
-    <canvas id="scratchCanvas"></canvas>
+  <div id="scratch-container">
+    <div id="result">C'est une fille !</div>
+    <canvas id="scratch" width="300" height="300"></canvas>
   </div>
 
   <script>
-    const img = document.getElementById("revealImage");
-    const canvas = document.getElementById("scratchCanvas");
+    const canvas = document.getElementById("scratch");
     const ctx = canvas.getContext("2d");
+    const img = new Image();
+    img.src = "fille ou garcon v2.png";
 
-    img.onload = () => {
-      canvas.width = img.clientWidth;
-      canvas.height = img.clientHeight;
+    img.onload = function () {
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    };
 
-      // Couleur de la surface à gratter
-      ctx.fillStyle = "#cccccc";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    let isDrawing = false;
+
+    canvas.addEventListener("mousedown", () => isDrawing = true);
+    canvas.addEventListener("mouseup", () => isDrawing = false);
+    canvas.addEventListener("mouseleave", () => isDrawing = false);
+    canvas.addEventListener("mousemove", draw);
+
+    function draw(e) {
+      if (!isDrawing) return;
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
 
       ctx.globalCompositeOperation = "destination-out";
-
-      let isDrawing = false;
-
-      const draw = (x, y) => {
-        ctx.beginPath();
-        ctx.arc(x, y, 20, 0, Math.PI * 2);
-        ctx.fill();
-      };
-
-      const getMousePos = (e) => {
-        const rect = canvas.getBoundingClientRect();
-        return {
-          x: e.clientX - rect.left,
-          y: e.clientY - rect.top
-        };
-      };
-
-      const getTouchPos = (e) => {
-        const rect = canvas.getBoundingClientRect();
-        const touch = e.touches[0];
-        return {
-          x: touch.clientX - rect.left,
-          y: touch.clientY - rect.top
-        };
-      };
-
-      canvas.addEventListener("mousedown", (e) => {
-        isDrawing = true;
-        const { x, y } = getMousePos(e);
-        draw(x, y);
-      });
-
-      canvas.addEventListener("mousemove", (e) => {
-        if (!isDrawing) return;
-        const { x, y } = getMousePos(e);
-        draw(x, y);
-      });
-
-      canvas.addEventListener("mouseup", () => {
-        isDrawing = false;
-      });
-
-      canvas.addEventListener("touchstart", (e) => {
-        e.preventDefault();
-        isDrawing = true;
-        const { x, y } = getTouchPos(e);
-        draw(x, y);
-      });
-
-      canvas.addEventListener("touchmove", (e) => {
-        e.preventDefault();
-        if (!isDrawing) return;
-        const { x, y } = getTouchPos(e);
-        draw(x, y);
-      });
-
-      canvas.addEventListener("touchend", () => {
-        isDrawing = false;
-      });
-    };
+      ctx.beginPath();
+      ctx.arc(x, y, 20, 0, Math.PI * 2, false);
+      ctx.fill();
+    }
   </script>
 </body>
 </html>
