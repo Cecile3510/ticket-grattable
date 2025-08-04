@@ -36,7 +36,7 @@
   const canvas = document.getElementById('scratchCanvas');
   const ctx = canvas.getContext('2d');
 
-  function drawHeart(ctx, x, y, size) {
+  function drawHeartPath(ctx, x, y, size) {
     ctx.beginPath();
     const topCurveHeight = size * 0.3;
     ctx.moveTo(x, y + topCurveHeight);
@@ -50,13 +50,14 @@
   function drawScratchArea() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.save();
-    drawHeart(ctx, canvas.width / 2, 30, 240);
+    drawHeartPath(ctx, canvas.width / 2, 30, 240);
     ctx.clip();
-    ctx.fillStyle = '#bbb';
+    ctx.fillStyle = '#bbb';  // gris clair pour la zone à gratter visible
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.restore();
   }
 
+  // Initialisation : afficher la zone grattable visible
   drawScratchArea();
 
   let isDrawing = false;
@@ -71,7 +72,7 @@
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
     ctx.save();
-    drawHeart(ctx, canvas.width / 2, 30, 240);
+    drawHeartPath(ctx, canvas.width / 2, 30, 240);
     ctx.clip();
     ctx.globalCompositeOperation = 'destination-out';
     ctx.beginPath();
