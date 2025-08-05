@@ -85,7 +85,7 @@
 
     // dessiner forme coeur comme masque
     ctx.save();
-    drawHeart(ctx, canvas.width / 2, 8, 180, 130);
+    drawHeart(ctx, canvas.width / 2, 7, 180, 130);
     ctx.clip();
 
     // dégradé métallique
@@ -134,7 +134,7 @@
     // On teste si le pixel est opaque (alpha>0) dans la zone cœur
     // Ici on va tester en utilisant isPointInPath
     ctx.beginPath();
-    drawHeart(ctx, canvas.width / 2, 8, 180, 130);
+    drawHeart(ctx, canvas.width / 2, 7, 180, 130);
     return ctx.isPointInPath(x, y);
   }
 
@@ -178,6 +178,7 @@
 
 </body>
 </html>
+
 
 
 
