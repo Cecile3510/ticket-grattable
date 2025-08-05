@@ -85,7 +85,7 @@
 
     // dessiner forme coeur comme masque
     ctx.save();
-    drawHeart(ctx, canvas.width / 2, 7, 180, 140);
+    drawHeart(ctx, canvas.width / 2, 5, 180, 150);
     ctx.clip();
 
     // dégradé métallique doré taupe luxueux
@@ -137,7 +137,7 @@ ctx.fillRect(0, 0, canvas.width, canvas.height);
     // On teste si le pixel est opaque (alpha>0) dans la zone cœur
     // Ici on va tester en utilisant isPointInPath
     ctx.beginPath();
-    drawHeart(ctx, canvas.width / 2, 7, 180, 140);
+    drawHeart(ctx, canvas.width / 2, 5, 180, 150);
     return ctx.isPointInPath(x, y);
   }
 
@@ -181,6 +181,7 @@ ctx.fillRect(0, 0, canvas.width, canvas.height);
 
 </body>
 </html>
+
 
 
 
