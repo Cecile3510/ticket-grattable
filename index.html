@@ -88,15 +88,16 @@
     drawHeart(ctx, canvas.width / 2, 7, 180, 130);
     ctx.clip();
 
-    // dégradé métallique doré
+    // dégradé doré foncé et luxueux
 const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-gradient.addColorStop(0, '#FFD700');   // or pur
-gradient.addColorStop(0.25, '#FFC107'); // or plus chaud
-gradient.addColorStop(0.5, '#FFF8DC');  // blanc cassé pour lumière
-gradient.addColorStop(0.75, '#E5B800'); // ombre dorée
-gradient.addColorStop(1, '#B8860B');    // or foncé
+gradient.addColorStop(0, '#8c6a28');    // brun doré
+gradient.addColorStop(0.25, '#b38b2f'); // doré moyen
+gradient.addColorStop(0.5, '#d4af37');  // doré classique (or)
+gradient.addColorStop(0.75, '#b38b2f'); // doré moyen
+gradient.addColorStop(1, '#8c6a28');    // brun doré
 ctx.fillStyle = gradient;
 ctx.fillRect(0, 0, canvas.width, canvas.height);
+
 
 
     // rayures fines
@@ -179,6 +180,7 @@ ctx.fillRect(0, 0, canvas.width, canvas.height);
 
 </body>
 </html>
+
 
 
 
